@@ -1,3 +1,4 @@
 crawler/node_modules/
 crawler/.secrets/
 .DS_Store
+.vercel

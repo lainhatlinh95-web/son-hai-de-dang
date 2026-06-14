@@ -1,6 +1,6 @@
 {
-  "fbGroupUrl": "",
-  "maxScrolls": 8,
-  "scrollDelayMs": 1500,
+  "fbGroupUrl": "https://www.facebook.com/groups/sonhaidedang/",
+  "maxScrolls": 10,
+  "scrollDelayMs": 1800,
   "headless": true
 }

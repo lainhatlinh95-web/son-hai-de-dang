@@ -32,6 +32,7 @@ function postHeadingLine(postText) {
 
 async function main() {
   const config = loadConfig();
+  config.progress = true;
   const chapters = loadChapters();
   const seenDocIds = new Set(chapters.map((c) => c.docId).filter(Boolean));
   const seenNums = new Set(chapters.map((c) => c.num));

@@ -1,25 +1,27 @@
 /* ============================================================
    Scrape a public Facebook group for chapter posts.
-   Headless Chromium + the saved FB session. Collects every
-   Google Docs link in the feed together with the text of the
-   post it sits in, so the crawler can read the "Chương N: …"
-   title. Resilient by design: it queries anchors + text, never
-   Facebook's churning CSS class names.
+   Headless Chromium + the saved FB session. Facebook renders
+   pasted Google Docs links as plain text / embedded JSON (not
+   <a> tags), so we harvest doc ids straight from the page
+   source on every scroll step. Resilient by design: no reliance
+   on Facebook's churning CSS class names. The chapter number &
+   title come from each Doc's own body (see crawl.mjs).
    ============================================================ */
 import { chromium } from 'playwright';
 import { loadConfig, STATE_PATH, hasSession } from './util.mjs';
-import { docId } from './parse.mjs';
 
-// Facebook wraps outbound links as l.facebook.com/l.php?u=<encoded>.
-function unwrapFbLink(href) {
-  try {
-    const u = new URL(href);
-    if (/(^|\.)facebook\.com$/.test(u.hostname) && u.pathname.includes('/l.php')) {
-      const target = u.searchParams.get('u');
-      if (target) return decodeURIComponent(target);
-    }
-  } catch { /* not a URL we can parse */ }
-  return href;
+// Facebook renders pasted Google Docs links as plain text / embedded JSON
+// rather than <a> tags, and often percent- or backslash-escapes the URL.
+// Pull every doc id out of the raw page source to catch them all
+// (including posts collapsed behind "Xem thêm").
+const DOC_ID_RE = /docs\.google\.com(?:\/|%2F|\\\/)document(?:\/|%2F|\\\/)d(?:\/|%2F|\\\/)([a-zA-Z0-9_-]{20,})/gi;
+
+export function extractDocIds(source) {
+  const ids = new Set();
+  let m;
+  DOC_ID_RE.lastIndex = 0;
+  while ((m = DOC_ID_RE.exec(source)) !== null) ids.add(m[1]);
+  return [...ids];
 }
 
 export async function scrapeGroup(config) {
@@ -42,42 +44,32 @@ export async function scrapeGroup(config) {
       throw new Error('Hit a Facebook login wall — the session expired. Run:  node login.mjs');
     }
 
-    // Lazy feed: scroll to pull in more posts.
-    for (let i = 0; i < (config.maxScrolls || 8); i++) {
+    // Lazy feed: scroll to pull in more posts, collecting doc ids as we go
+    // (older posts unmount from the DOM, so harvest on every scroll step).
+    const ids = new Set();
+    const harvest = async () => {
+      const html = await page.content();
+      const text = await page.evaluate(() => document.body.innerText);
+      extractDocIds(html).forEach((id) => ids.add(id));
+      extractDocIds(text).forEach((id) => ids.add(id));
+    };
+
+    await harvest();
+    const total = config.maxScrolls || 8;
+    for (let i = 0; i < total; i++) {
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       await page.waitForTimeout(config.scrollDelayMs || 1500);
-    }
-
-    const raw = await page.evaluate(() => {
-      const out = [];
-      const anchors = document.querySelectorAll('a[href*="docs.google.com/document"], a[href*="l.php"][href*="docs.google.com"], a[href*="l.php"][href*="document"]');
-      anchors.forEach((a) => {
-        // climb to the enclosing post (role=article), else a sizeable ancestor.
-        let post = a.closest('[role="article"]');
-        if (!post) {
-          let n = a;
-          for (let i = 0; i < 8 && n.parentElement; i++) {
-            n = n.parentElement;
-            if (n.innerText && n.innerText.length > 80) { post = n; break; }
-          }
-        }
-        out.push({ href: a.href, postText: (post?.innerText || a.innerText || '').slice(0, 600) });
-      });
-      return out;
-    });
-
-    // Dedupe by docId, keep the richest post text.
-    const byId = new Map();
-    for (const r of raw) {
-      const url = unwrapFbLink(r.href);
-      const id = docId(url);
-      if (!id || !url.includes('docs.google.com')) continue;
-      const prev = byId.get(id);
-      if (!prev || (r.postText || '').length > (prev.postText || '').length) {
-        byId.set(id, { docUrl: `https://docs.google.com/document/d/${id}/edit`, docId: id, postText: r.postText });
+      await harvest();
+      if (config.progress && (i % 10 === 9 || i === total - 1)) {
+        console.log(`  …scroll ${i + 1}/${total} — ${ids.size} doc(s) so far`);
       }
     }
-    return [...byId.values()];
+
+    return [...ids].map((id) => ({
+      docUrl: `https://docs.google.com/document/d/${id}/edit`,
+      docId: id,
+      postText: '',
+    }));
   } finally {
     await browser.close();
   }
@@ -86,9 +78,6 @@ export async function scrapeGroup(config) {
 // Run standalone: print what was found.
 if (import.meta.url === `file://${process.argv[1]}`) {
   const found = await scrapeGroup(loadConfig());
-  console.log(`Found ${found.length} chapter link(s):`);
-  for (const f of found) {
-    const firstLine = (f.postText || '').split('\n').find((l) => l.trim()) || '(no text)';
-    console.log(`  • ${f.docId}  —  ${firstLine.slice(0, 80)}`);
-  }
+  console.log(`Found ${found.length} Google Docs link(s):`);
+  for (const f of found) console.log(`  • ${f.docId}`);
 }

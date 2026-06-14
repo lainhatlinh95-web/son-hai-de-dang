@@ -10,7 +10,11 @@ export const CHAPTERS_PATH = path.join(REPO_ROOT, 'data', 'chapters.json');
 
 export function loadConfig() {
   const raw = JSON.parse(fs.readFileSync(path.join(CRAWLER_DIR, 'config.json'), 'utf8'));
-  return { fbGroupUrl: '', maxScrolls: 8, scrollDelayMs: 1500, headless: true, ...raw };
+  const cfg = { fbGroupUrl: '', maxScrolls: 8, scrollDelayMs: 1500, headless: true, ...raw };
+  // env overrides (used for one-off deep backfills without touching config.json)
+  if (process.env.CRAWL_MAX_SCROLLS) cfg.maxScrolls = parseInt(process.env.CRAWL_MAX_SCROLLS, 10);
+  if (process.env.CRAWL_GROUP_URL) cfg.fbGroupUrl = process.env.CRAWL_GROUP_URL;
+  return cfg;
 }
 
 export function loadChapters() {
