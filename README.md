@@ -32,8 +32,9 @@ python3 -m http.server 8000
 
 | File | Vai trò |
 |---|---|
-| `Đọc Truyện.html` | Giao diện + style (entry chính) |
-| `index.html` | Chuyển hướng tới `Đọc Truyện.html` (để chạy ở thư mục gốc / GitHub Pages) |
+| `index.html` | Giao diện + style (entry chính) |
+| `Đọc Truyện.html` | Chuyển hướng tới `index.html` (giữ link bản thiết kế gốc) |
+| `vercel.json` / `.vercelignore` | Cấu hình deploy tĩnh lên Vercel |
 | `app.js` | Logic: state, đọc, thêm/xóa chương, lưu tiến độ, nạp `data/chapters.json` |
 | `data/chapters.json` | Danh sách chương (crawler ghi vào; app đọc từ đây) |
 | `data/seed.js` | Chương 868 — dự phòng khi mở bằng `file://` (không fetch được) |
