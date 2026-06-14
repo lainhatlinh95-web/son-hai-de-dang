@@ -8,9 +8,12 @@ Trình đọc truyện chữ riêng tư, tối ưu cho điện thoại. Chạy h
 - **Thư viện** với thẻ "Tiếp tục đọc" ghi nhớ chương và vị trí gần nhất.
 - **Trình đọc** chữ Việt căn đều, đẹp; chạm giữa màn hình để ẩn/hiện thanh công cụ (chế độ đắm chìm).
 - **Tùy chỉnh**: 3 nền (Giấy / Sáng / Tối), 3 phông (Lora / Noto / Sans), cỡ chữ & giãn dòng.
-- **Thêm chương**:
+- **Tự động cập nhật chương** — script chạy hằng ngày trên máy Mac đọc nhóm Facebook công
+  khai, lấy link Google Docs của chương mới, tải về và đẩy lên `data/chapters.json`; mở app
+  là thấy chương mới. Xem [`crawler/`](crawler/README.md).
+- **Thêm chương thủ công** (luôn hoạt động, dùng khi crawler lỗi):
   - *Từ link Google Docs* — dán link (mỗi dòng một link), app tự lấy nội dung qua public relay.
-  - *Dán văn bản* — phương án dự phòng luôn hoạt động; tự nhận số & tên "Chương …".
+  - *Dán văn bản* — tự nhận số & tên "Chương …".
 - Đã nạp sẵn **Chương 868** để mở là đọc được ngay.
 
 ## Chạy
@@ -31,10 +34,13 @@ python3 -m http.server 8000
 |---|---|
 | `Đọc Truyện.html` | Giao diện + style (entry chính) |
 | `index.html` | Chuyển hướng tới `Đọc Truyện.html` (để chạy ở thư mục gốc / GitHub Pages) |
-| `app.js` | Logic: state, đọc, thêm/xóa chương, lưu tiến độ |
-| `data/seed.js` | Chương 868 nạp sẵn |
+| `app.js` | Logic: state, đọc, thêm/xóa chương, lưu tiến độ, nạp `data/chapters.json` |
+| `data/chapters.json` | Danh sách chương (crawler ghi vào; app đọc từ đây) |
+| `data/seed.js` | Chương 868 — dự phòng khi mở bằng `file://` (không fetch được) |
+| `crawler/` | Script cào chương từ nhóm Facebook (chạy trên Mac) — xem README riêng |
 
 ## Lưu ý
 
-- Không có đồng bộ nền tự động — chương mới chỉ xuất hiện khi bạn dán link/văn bản.
-- Dữ liệu lưu trên một máy/trình duyệt; xóa site data sẽ mất thư viện & tiến độ đọc.
+- Cào Facebook là giải pháp **không chính thức và dễ vỡ** (FB đổi giao diện là hỏng) — luôn
+  còn nút *Thêm chương* thủ công làm dự phòng. Crawler chỉ chạy khi Mac bật, mỗi ngày 1 lần.
+- Dữ liệu đọc (vị trí, đã đọc) lưu trên một máy/trình duyệt; xóa site data sẽ mất tiến độ.

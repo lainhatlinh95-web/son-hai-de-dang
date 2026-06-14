@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  macOS LaunchAgent: run the daily crawl at 06:00.
+  Install:
+    cp crawler/com.lainhatlinh95.truyenchu-crawl.plist ~/Library/LaunchAgents/
+    # edit the path below if your repo is not at ~/truyen-chu
+    launchctl unload ~/Library/LaunchAgents/com.lainhatlinh95.truyenchu-crawl.plist 2>/dev/null
+    launchctl load  ~/Library/LaunchAgents/com.lainhatlinh95.truyenchu-crawl.plist
+  Run once now (test):
+    launchctl start com.lainhatlinh95.truyenchu-crawl
+  Logs: crawler/.secrets/crawl.log  (plus launchd.out/err below)
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.lainhatlinh95.truyenchu-crawl</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/tdadnhatlinh/truyen-chu/crawler/run.sh</string>
+  </array>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>6</integer>
+    <key>Minute</key><integer>0</integer>
+  </dict>
+
+  <!-- if the Mac was asleep at 06:00, run as soon as it wakes -->
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/tdadnhatlinh/truyen-chu/crawler/.secrets/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/tdadnhatlinh/truyen-chu/crawler/.secrets/launchd.err.log</string>
+</dict>
+</plist>

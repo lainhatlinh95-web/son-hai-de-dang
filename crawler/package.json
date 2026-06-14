@@ -1,0 +1,15 @@
+{
+  "name": "truyen-chu-crawler",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Daily scraper: discover Sơn Hải chapter Google Docs links in a public FB group, fetch and parse them into data/chapters.json.",
+  "scripts": {
+    "login": "node login.mjs",
+    "scrape": "node scrape.mjs",
+    "crawl": "node crawl.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}

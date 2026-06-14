@@ -8,6 +8,8 @@
   var LS_CHAPTERS = 'tc_chapters_v1';
   var LS_STATE = 'tc_state_v1';
   var LS_SETTINGS = 'tc_settings_v1';
+  var LS_REMOVED = 'tc_removed_v1';   // chapter nums the user deleted (so the daily crawl won't re-add them)
+  var CHAPTERS_URL = 'data/chapters.json';
 
   /* ---------- storage helpers ---------- */
   function load(key, fallback) {
@@ -16,13 +18,46 @@
   }
   function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
 
+  function normalizeChapter(c) {
+    return { num: c.num, title: c.title, paragraphs: (c.paragraphs || []).slice(),
+             sourceUrl: c.sourceUrl || '', addedAt: c.addedAt || Date.now() };
+  }
+
   /* ---------- state ---------- */
+  // The working library lives in localStorage; new chapters from the daily crawl
+  // (data/chapters.json) and manual adds are merged into it. seed.js is the
+  // offline fallback when the file can't be fetched (e.g. opened via file://).
   var chapters = load(LS_CHAPTERS, null);
   if (!chapters || !chapters.length) {
-    chapters = (window.SEED_CHAPTERS || []).map(function (c) {
-      return { num: c.num, title: c.title, paragraphs: c.paragraphs.slice(), sourceUrl: c.sourceUrl || '', addedAt: Date.now() };
+    chapters = (window.SEED_CHAPTERS || []).map(normalizeChapter);
+    if (chapters.length) save(LS_CHAPTERS, chapters);
+  }
+  var removed = load(LS_REMOVED, []);   // nums the user deleted
+
+  // Merge crawled/seed chapters into the library, skipping ones the user removed.
+  function mergeIncoming(list) {
+    var have = {};
+    chapters.forEach(function (c) { have[c.num] = true; });
+    var gone = {};
+    removed.forEach(function (n) { gone[n] = true; });
+    var added = 0;
+    (list || []).forEach(function (c) {
+      if (c == null || c.num == null) return;
+      if (have[c.num] || gone[c.num]) return;
+      chapters.push(normalizeChapter(c));
+      have[c.num] = true;
+      added++;
     });
-    save(LS_CHAPTERS, chapters);
+    if (added) { save(LS_CHAPTERS, chapters); renderLibrary(); }
+    return added;
+  }
+
+  // Pull the crawler's committed chapters; fall back to the bundled seed offline.
+  function syncCrawled() {
+    fetch(CHAPTERS_URL, { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+      .then(function (list) { mergeIncoming(list); })
+      .catch(function () { mergeIncoming(window.SEED_CHAPTERS || []); });
   }
   var state = load(LS_STATE, { lastNum: null, pos: {}, read: {} });
   if (!state.pos) state.pos = {};
@@ -329,6 +364,8 @@
     if (i >= 0) chapters[i] = ch; else chapters.push(ch);
     sortChaps();
     save(LS_CHAPTERS, chapters);
+    var ri = removed.indexOf(ch.num);   // re-adding clears any prior deletion
+    if (ri !== -1) { removed.splice(ri, 1); save(LS_REMOVED, removed); }
   }
 
   /* ----- Google Docs URL → text via CORS relays ----- */
@@ -451,6 +488,7 @@
         if (!confirm('Xóa Chương ' + c.num + '?')) return;
         chapters = chapters.filter(function (x) { return x.num !== c.num; });
         save(LS_CHAPTERS, chapters);
+        if (removed.indexOf(c.num) === -1) { removed.push(c.num); save(LS_REMOVED, removed); }
         renderManage(); renderLibrary();
       };
       ml.appendChild(row);
@@ -474,4 +512,5 @@
   /* ---------- boot ---------- */
   applySettings();
   renderLibrary();
+  syncCrawled();   // pull any chapters added by the daily crawl
 })();
