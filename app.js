@@ -66,6 +66,7 @@
 
   var current = null;       // current chapter num while reading
   var saveTimer = null;
+  var chapterQuery = '';
 
   /* ---------- dom ---------- */
   var $ = function (s) { return document.querySelector(s); };
@@ -126,6 +127,11 @@
   $('#setBtn').onclick = function () { openSheet('#setSheet'); };
   $('#rSetBtn').onclick = function () { openSheet('#setSheet'); };
   $('#addBtn').onclick = function () { renderManage(); openSheet('#addSheet'); };
+  $('#chapSearch').addEventListener('input', function (e) {
+    chapterQuery = e.target.value.replace(/\D/g, '');
+    if (e.target.value !== chapterQuery) e.target.value = chapterQuery;
+    renderLibrary();
+  });
 
   /* ============================================================
      LIBRARY
@@ -146,7 +152,14 @@
     $('#libSub').textContent = chapters.length
       ? chapters.length + ' chương · ' + (min === max ? ('Chương ' + min) : ('Chương ' + min + '–' + max))
       : 'Chưa có chương nào';
-    $('#chapCount').textContent = chapters.length ? chapters.length + ' chương' : '';
+    var visibleChapters = chapters.slice().reverse();
+    if (chapterQuery) {
+      var wanted = parseInt(chapterQuery, 10);
+      visibleChapters = visibleChapters.filter(function (c) { return c.num === wanted; });
+    }
+    $('#chapCount').textContent = chapterQuery
+      ? visibleChapters.length + '/' + chapters.length + ' chương'
+      : (chapters.length ? chapters.length + ' chương' : '');
 
     // continue card
     var cc = $('#continueCard');
@@ -167,12 +180,14 @@
 
     // list
     var list = $('#chapList');
-    if (!chapters.length) {
-      list.innerHTML = '<div class="empty">Chưa có chương nào.<br>Bấm <b>Thêm chương</b> để dán link Google Docs.</div>';
+    if (!visibleChapters.length) {
+      list.innerHTML = chapters.length
+        ? '<div class="empty">Không tìm thấy Chương ' + esc(chapterQuery) + '.</div>'
+        : '<div class="empty">Chưa có chương nào.<br>Bấm <b>Thêm chương</b> để dán link Google Docs.</div>';
       return;
     }
     list.innerHTML = '';
-    chapters.forEach(function (c) {
+    visibleChapters.forEach(function (c) {
       var pct = progressOf(c.num);
       var done = pct >= 100;
       var started = pct > 0 && !done;

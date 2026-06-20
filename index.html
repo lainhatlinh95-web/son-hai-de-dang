@@ -87,6 +87,18 @@ button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:n
 .sec-head h2{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin:0;}
 .sec-head span{font-size:12px;color:var(--ink-soft);}
 
+.chap-search{
+  display:flex;align-items:center;gap:10px;margin:0 0 4px;padding:0 13px;
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;
+}
+.chap-search:focus-within{border-color:var(--accent);}
+.chap-search svg{width:18px;height:18px;color:var(--ink-soft);flex:0 0 auto;}
+.chap-search input{
+  width:100%;padding:12px 0;border:0;outline:0;background:transparent;color:var(--ink);
+  font-family:var(--ui);font-size:14px;
+}
+.chap-search input::placeholder{color:var(--ink-soft);}
+
 .chap{
   display:flex;align-items:center;gap:14px;width:100%;text-align:left;
   padding:15px 6px;border-bottom:1px solid var(--line-soft);transition:opacity .12s;
@@ -260,6 +272,10 @@ textarea.inp:focus{outline:none;border-color:var(--accent);}
         </button>
       </div>
       <div class="sec-head"><h2>Mục lục</h2><span id="chapCount"></span></div>
+      <label class="chap-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="chapSearch" type="search" inputmode="numeric" pattern="[0-9]*" placeholder="Tìm theo số chương" aria-label="Tìm theo số chương">
+      </label>
       <div id="chapList"></div>
     </div>
   </section>
