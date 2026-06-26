@@ -1,4 +1,4 @@
-# CLAUDE.md — agent runbook for the Sơn Hải reader
+# CLAUDE.md — agent runbook for the Sơn Hải Đề Đăng reader
 
 Web reader for the Vietnamese web novel **Sơn Hải Đề Đăng** (tác giả Dược Thiên Sầu).
 A static site plus a Facebook-group scraper that keeps it updated with new chapters.
@@ -6,7 +6,7 @@ This file tells an agent on a fresh clone how to update chapters on any machine.
 
 ## What it is
 - **Live site:** https://truyen-chu-nine.vercel.app — Vercel, **auto-deploys on every push to `main`**.
-- **Repo:** `lainhatlinh95-web/truyen-chu` (public). GitHub CLI account: `lainhatlinh95-web`.
+- **Repo:** `lainhatlinh95-web/son-hai-de-dang` (public). GitHub CLI account: `lainhatlinh95-web`.
 - Reader is plain HTML/CSS/JS — **no build step**.
 
 ## File map
@@ -68,7 +68,7 @@ Pushing to `main` triggers the Vercel redeploy automatically — nothing else ne
 
 ## Daily automation (optional)
 - **macOS:** `mkdir -p ~/Library/LaunchAgents && cp crawler/com.lainhatlinh95.truyenchu-crawl.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.lainhatlinh95.truyenchu-crawl.plist`
-  (runs at login + 6am; edit the paths in the plist if the repo isn't at `~/truyen-chu`).
+  (runs at login + 6am; edit the paths in the plist if the local checkout isn't at `~/truyen-chu`).
 - **Linux/other:** add a cron job that runs `crawler/run.sh`.
 
 ## Known limits (don't re-investigate — these are confirmed)

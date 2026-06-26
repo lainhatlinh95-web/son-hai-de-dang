@@ -1,4 +1,4 @@
-# Sơn Hải — Trình đọc truyện chữ
+# Sơn Hải Đề Đăng — Trình đọc truyện chữ
 
 Trình đọc truyện chữ riêng tư, tối ưu cho điện thoại. Chạy hoàn toàn trong trình duyệt
 (không cần server), lưu thư viện và vị trí đọc vào `localStorage` của máy.

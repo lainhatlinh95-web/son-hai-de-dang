@@ -45,7 +45,7 @@ launchctl start com.lainhatlinh95.truyenchu-crawl   # run once now to verify
 ```
 
 Runs at 06:00 whenever the Mac is awake. Logs: `.secrets/crawl.log`.
-(If the repo isn't at `~/truyen-chu`, edit the paths in the `.plist` first.)
+(If the local checkout isn't at `~/truyen-chu`, edit the paths in the `.plist` first.)
 
 ## Files
 
