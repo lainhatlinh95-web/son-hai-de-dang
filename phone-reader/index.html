@@ -42,7 +42,7 @@ small{color:var(--mut)}
 </div>
 
 <script>
-fetch('reader.js').then(function(r){return r.text()}).then(function(t){
+fetch('/phone-reader/reader.js').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(function(t){
   var code='javascript:'+encodeURIComponent(t.replace(/\s+/g,' ').trim());
   var ta=document.getElementById('code');ta.value=code;
   document.getElementById('copy').onclick=function(){
@@ -51,6 +51,9 @@ fetch('reader.js').then(function(r){return r.text()}).then(function(t){
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done,function(){document.execCommand('copy');done()})}
     else{document.execCommand('copy');done()}
   };
+}).catch(function(e){
+  document.getElementById('code').value='Lỗi tải mã ('+e.message+'). Hãy tải lại trang.';
+  document.getElementById('copy').disabled=true;
 });
 </script>
 </main></body>
