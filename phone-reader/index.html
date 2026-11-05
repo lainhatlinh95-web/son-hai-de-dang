@@ -21,22 +21,11 @@ small{color:var(--mut)}
 <p class="lead">Đọc truyện trên Cơm Nguội không quảng cáo, không pop-up, có nút Chương sau. Chạy ngay trên trình duyệt điện thoại của bạn, bằng tài khoản của bạn.</p>
 
 <div class="card">
-<b>Android: cách chắc chắn nhất (Firefox, không cần dấu trang)</b>
-<p style="margin:6px 0 10px;color:var(--mut)">Chrome trên Android thường không chạy dấu trang kiểu này. Firefox thì dùng được tiện ích, và trang sẽ tự chuyển sang chế độ đọc sạch.</p>
+<b>iPhone (chỉ dùng Safari, Chrome trên iPhone không chạy được)</b>
 <ol>
-<li>Cài <b>Firefox</b> từ Cửa hàng Play.</li>
-<li>Trong Firefox: menu ⋮ → <b>Tiện ích</b> (Add-ons) → cài <b>Violentmonkey</b>.</li>
-<li>Bấm nút dưới đây, rồi bấm <b>Xác nhận cài đặt</b>:<br><a href="/phone-reader/reader.user.js" style="display:block;margin-top:8px;text-align:center;background:var(--acc);color:#fff;border-radius:10px;padding:12px;font-weight:600;text-decoration:none">Cài script Đọc sạch</a></li>
-<li>Đăng nhập Cơm Nguội trong Firefox, rồi mở một chương: trang tự chuyển sang đọc sạch. Muốn xem trang gốc, thêm <code>?raw=1</code> vào cuối địa chỉ.</li>
-</ol>
-</div>
-
-<div class="card">
-<b>Cách dấu trang (iPhone Safari, hoặc nếu không dùng Firefox)</b>
-<ol>
-<li>Bấm nút bên dưới để sao chép mã.</li>
-<li>Tạo dấu trang (bookmark) cho bất kỳ trang nào: <b>iPhone</b> Chia sẻ → Thêm dấu trang; <b>Android Chrome</b> menu ⋮ → ⭐.</li>
-<li>Sửa dấu trang đó: đặt tên <b>Đọc sạch</b>, xóa địa chỉ cũ và <b>dán mã</b> vào ô địa chỉ (URL).</li>
+<li>Trong <b>Safari</b>, bấm nút bên dưới để sao chép mã. Nếu nút không chép được, chạm vào ô mã, giữ, chọn <b>Chọn tất cả</b> rồi <b>Sao chép</b>.</li>
+<li>Bấm nút Chia sẻ → <b>Thêm dấu trang</b> (cho trang này), đặt tên <b>Đọc sạch</b>, lưu.</li>
+<li>Mở Dấu trang (biểu tượng quyển sách) → <b>Sửa</b> → chạm vào <b>Đọc sạch</b> → xóa địa chỉ cũ và <b>dán mã</b> vào ô địa chỉ → Xong.</li>
 </ol>
 <button id="copy" type="button">Sao chép mã</button>
 <textarea id="short" readonly></textarea>
@@ -48,10 +37,20 @@ small{color:var(--mut)}
 </div>
 
 <div class="card">
-<b>Mỗi lần đọc</b>
+<b>Android: dùng Firefox, không cần dấu trang</b>
+<p style="margin:6px 0 10px;color:var(--mut)">Chrome trên Android thường không chạy dấu trang kiểu này. Firefox thì dùng được tiện ích, và trang tự chuyển sang chế độ đọc sạch.</p>
 <ol>
-<li>Đăng nhập Cơm Nguội trên trình duyệt đó (một lần), mở một chương bất kỳ, đợi chương hiện ra.</li>
-<li><b>iPhone Safari:</b> mở Dấu trang → bấm <b>Đọc sạch</b>.<br><b>Android Chrome:</b> gõ <b>Đọc sạch</b> vào thanh địa chỉ rồi chọn dấu trang trong danh sách.<br><b>Android Firefox:</b> tương tự Chrome.</li>
+<li>Cài <b>Firefox</b> từ Cửa hàng Play, rồi cài tiện ích <b>Violentmonkey</b> (menu ⋮ → Tiện ích).</li>
+<li>Bấm nút dưới đây, rồi <b>Xác nhận cài đặt</b>:<br><a href="/phone-reader/reader.user.js" style="display:block;margin-top:8px;text-align:center;background:var(--acc);color:#fff;border-radius:10px;padding:12px;font-weight:600;text-decoration:none">Cài script Đọc sạch</a></li>
+<li>Đăng nhập Cơm Nguội trong Firefox, mở một chương. Muốn xem trang gốc, thêm <code>?raw=1</code> vào cuối địa chỉ.</li>
+</ol>
+</div>
+
+<div class="card">
+<b>Mỗi lần đọc (iPhone)</b>
+<ol>
+<li>Trong Safari, đăng nhập Cơm Nguội (một lần), mở một chương bất kỳ, đợi chương hiện ra.</li>
+<li>Mở Dấu trang (quyển sách) → bấm <b>Đọc sạch</b>.</li>
 <li>Trang chuyển thành chế độ đọc sạch. Bấm <b>Sau →</b> để sang chương kế tiếp.</li>
 </ol>
 <small>Mã chỉ chạy trong trình duyệt của bạn, không gửi dữ liệu đi đâu và không lưu nội dung truyện. Nếu thấy "chưa tải được", hãy chờ bước xác minh Cloudflare của trang gốc xong rồi bấm Thử lại.</small>
@@ -70,7 +69,7 @@ function wire(btnId,ta,code){
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done,legacy)}else{legacy()}
   };
 }
-var loader="javascript:import('"+location.origin+"/phone-reader/reader.js')";
+var loader="javascript:void(document.body.appendChild(Object.assign(document.createElement('script'),{src:'"+location.origin+"/phone-reader/reader.js'})))";
 wire('copy',document.getElementById('short'),loader);
 fetch('/phone-reader/reader.js').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(function(t){
   wire('copyfull',document.getElementById('code'),'javascript:'+encodeURIComponent(t.replace(/\s+/g,' ').trim()));
