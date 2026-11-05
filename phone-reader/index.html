@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đọc sạch – cài đặt</title>
+<style>
+:root{--bg:#f5f1e8;--card:#fffdf8;--ink:#24312c;--mut:#78817b;--line:#e5dfd3;--acc:#26776b}
+@media(prefers-color-scheme:dark){:root{--bg:#171d1b;--card:#202925;--ink:#e9eee9;--mut:#a6b0aa;--line:#35413b;--acc:#79cbbb}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 60px}h1{font:600 26px/1.2 Georgia,serif;margin:8px 0 6px}
+p.lead{color:var(--mut);margin:0 0 18px}ol{padding-left:22px}li{margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+button{font:inherit;font-weight:600;border:0;border-radius:10px;background:var(--acc);color:#fff;padding:12px 18px;width:100%}
+textarea{width:100%;height:90px;margin-top:10px;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px}
+small{color:var(--mut)}
+</style>
+</head>
+<body><main>
+<h1>Đọc sạch</h1>
+<p class="lead">Đọc truyện trên Cơm Nguội không quảng cáo, không pop-up, có nút Chương sau. Chạy ngay trên trình duyệt điện thoại của bạn, bằng tài khoản của bạn.</p>
+
+<div class="card">
+<b>Cài một lần (khoảng 1 phút)</b>
+<ol>
+<li>Bấm nút bên dưới để sao chép mã.</li>
+<li>Tạo dấu trang (bookmark) cho bất kỳ trang nào: <b>iPhone</b> Chia sẻ → Thêm dấu trang; <b>Android Chrome</b> menu ⋮ → ⭐.</li>
+<li>Sửa dấu trang đó: đặt tên <b>Đọc sạch</b>, xóa địa chỉ cũ và <b>dán mã</b> vào ô địa chỉ (URL).</li>
+</ol>
+<button id="copy" type="button">Sao chép mã</button>
+<textarea id="code" readonly></textarea>
+</div>
+
+<div class="card">
+<b>Mỗi lần đọc</b>
+<ol>
+<li>Đăng nhập Cơm Nguội trên trình duyệt đó (một lần), mở một chương bất kỳ, đợi chương hiện ra.</li>
+<li><b>iPhone Safari:</b> mở Dấu trang → bấm <b>Đọc sạch</b>.<br><b>Android Chrome:</b> gõ <b>Đọc sạch</b> vào thanh địa chỉ rồi chọn dấu trang trong danh sách.<br><b>Android Firefox:</b> tương tự Chrome.</li>
+<li>Trang chuyển thành chế độ đọc sạch. Bấm <b>Sau →</b> để sang chương kế tiếp.</li>
+</ol>
+<small>Mã chỉ chạy trong trình duyệt của bạn, không gửi dữ liệu đi đâu và không lưu nội dung truyện. Nếu thấy "chưa tải được", hãy chờ bước xác minh Cloudflare của trang gốc xong rồi bấm Thử lại.</small>
+</div>
+
+<script>
+fetch('reader.js').then(function(r){return r.text()}).then(function(t){
+  var code='javascript:'+encodeURIComponent(t.replace(/\s+/g,' ').trim());
+  var ta=document.getElementById('code');ta.value=code;
+  document.getElementById('copy').onclick=function(){
+    ta.select();ta.setSelectionRange(0,code.length);
+    var done=function(){document.getElementById('copy').textContent='Đã sao chép ✓'};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done,function(){document.execCommand('copy');done()})}
+    else{document.execCommand('copy');done()}
+  };
+});
+</script>
+</main></body>
+</html>
