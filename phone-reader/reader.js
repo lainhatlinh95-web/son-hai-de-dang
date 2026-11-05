@@ -91,7 +91,7 @@
     store.set('qr:' + slug, String(n));
     if (push) { history.pushState(null, '', base + n); }
     $('lbl').textContent = 'Chương ' + n;
-    $('src').href = base + n;
+    $('src').href = base + n + '?raw=1';
     $('pv').disabled = n <= 1;
     $('txt').textContent = '';
     $('ttl').textContent = '';
