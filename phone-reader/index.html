@@ -12,7 +12,7 @@ main{max-width:640px;margin:0 auto;padding:20px 16px 60px}h1{font:600 26px/1.2 G
 p.lead{color:var(--mut);margin:0 0 18px}ol{padding-left:22px}li{margin-bottom:10px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
 button{font:inherit;font-weight:600;border:0;border-radius:10px;background:var(--acc);color:#fff;padding:12px 18px;width:100%}
-textarea{width:100%;height:90px;margin-top:10px;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px}
+textarea{width:100%;height:70px;font-size:15px;margin-top:10px;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px}
 small{color:var(--mut)}
 </style>
 </head>
@@ -59,7 +59,7 @@ function wire(btnId,ta,code){
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done,legacy)}else{legacy()}
   };
 }
-var loader="javascript:(function(){var s=document.createElement('script');s.src='"+location.origin+"/phone-reader/reader.js?'+Date.now();s.onerror=function(){alert('Không tải được trình đọc')};document.body.appendChild(s)})()";
+var loader="javascript:import('"+location.origin+"/phone-reader/reader.js')";
 wire('copy',document.getElementById('short'),loader);
 fetch('/phone-reader/reader.js').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(function(t){
   wire('copyfull',document.getElementById('code'),'javascript:'+encodeURIComponent(t.replace(/\s+/g,' ').trim()));
