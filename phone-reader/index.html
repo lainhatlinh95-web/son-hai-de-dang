@@ -28,7 +28,12 @@ small{color:var(--mut)}
 <li>Sửa dấu trang đó: đặt tên <b>Đọc sạch</b>, xóa địa chỉ cũ và <b>dán mã</b> vào ô địa chỉ (URL).</li>
 </ol>
 <button id="copy" type="button">Sao chép mã</button>
+<textarea id="short" readonly></textarea>
+<small>Mã ngắn này tải trình đọc từ trang của mình mỗi lần bấm, nên luôn là bản mới nhất.</small>
+<details style="margin-top:12px"><summary><small>Mã đầy đủ (chỉ dùng nếu mã ngắn không chạy)</small></summary>
+<button id="copyfull" type="button" style="margin-top:8px">Sao chép mã đầy đủ</button>
 <textarea id="code" readonly></textarea>
+</details>
 </div>
 
 <div class="card">
@@ -42,18 +47,22 @@ small{color:var(--mut)}
 </div>
 
 <script>
-fetch('/phone-reader/reader.js').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(function(t){
-  var code='javascript:'+encodeURIComponent(t.replace(/\s+/g,' ').trim());
-  var ta=document.getElementById('code');ta.value=code;
-  document.getElementById('copy').onclick=function(){
-    ta.select();ta.setSelectionRange(0,code.length);
-    var done=function(){document.getElementById('copy').textContent='Đã sao chép ✓'};
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done,function(){document.execCommand('copy');done()})}
-    else{document.execCommand('copy');done()}
+function wire(btnId,ta,code){
+  var btn=document.getElementById(btnId),label=btn.textContent;
+  ta.value=code;
+  btn.onclick=function(){
+    var done=function(){btn.textContent='Đã sao chép ✓';setTimeout(function(){btn.textContent=label},2500)};
+    var legacy=function(){ta.focus();ta.select();ta.setSelectionRange(0,code.length);try{document.execCommand('copy')}catch(e){}done()};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done,legacy)}else{legacy()}
   };
+}
+var loader="javascript:(function(){var s=document.createElement('script');s.src='"+location.origin+"/phone-reader/reader.js?'+Date.now();s.onerror=function(){alert('Không tải được trình đọc')};document.body.appendChild(s)})()";
+wire('copy',document.getElementById('short'),loader);
+fetch('/phone-reader/reader.js').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(function(t){
+  wire('copyfull',document.getElementById('code'),'javascript:'+encodeURIComponent(t.replace(/\s+/g,' ').trim()));
 }).catch(function(e){
   document.getElementById('code').value='Lỗi tải mã ('+e.message+'). Hãy tải lại trang.';
-  document.getElementById('copy').disabled=true;
+  document.getElementById('copyfull').disabled=true;
 });
 </script>
 </main></body>
