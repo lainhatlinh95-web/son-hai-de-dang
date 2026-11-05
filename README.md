@@ -42,6 +42,7 @@ python3 -m http.server 8000
 | `data/chapters.json` | Danh sách chương (crawler ghi vào; app đọc từ đây) |
 | `data/seed.js` | Chương 868 — dự phòng khi mở bằng `file://` (không fetch được) |
 | `crawler/` | Script cào chương từ nhóm Facebook (chạy trên Mac) — xem README riêng |
+| `quiet-reader/index.html` | Standalone clean-reader page; novel chapters remain separate |
 
 ## Lưu ý
 
