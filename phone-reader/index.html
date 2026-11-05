@@ -50,9 +50,12 @@ small{color:var(--mut)}
 function wire(btnId,ta,code){
   var btn=document.getElementById(btnId),label=btn.textContent;
   ta.value=code;
+  ta.removeAttribute('readonly');
+  ta.onclick=function(){ta.select();ta.setSelectionRange(0,code.length)};
   btn.onclick=function(){
-    var done=function(){btn.textContent='Đã sao chép ✓';setTimeout(function(){btn.textContent=label},2500)};
-    var legacy=function(){ta.focus();ta.select();ta.setSelectionRange(0,code.length);try{document.execCommand('copy')}catch(e){}done()};
+    var show=function(msg){btn.textContent=msg;setTimeout(function(){btn.textContent=label},3500)};
+    var done=function(){show('Đã sao chép ✓')};
+    var legacy=function(){ta.focus();ta.select();ta.setSelectionRange(0,code.length);var ok=false;try{ok=document.execCommand('copy')}catch(e){}ok?done():show('Không chép được: chạm vào ô, giữ, chọn Sao chép')};
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done,legacy)}else{legacy()}
   };
 }
